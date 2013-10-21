@@ -158,7 +158,7 @@ class LiqPay extends CApplicationComponent
         $operationXml = simplexml_load_string(base64_decode($responseXml->liqpay->operation_envelope->operation_xml));
 
         if ($operationXml->status != 'success') {
-            throw new CException($operationXml->response_description);
+            throw new LiqPayException(Yii::t('liqpay', (string) $operationXml->response_description), (string) $operationXml->code);
         }
 
         return $operationXml;
@@ -176,6 +176,40 @@ class LiqPay extends CApplicationComponent
         $xml .= '</request>';
 
         return $xml;
+    }
+
+}
+
+class LiqPayException extends CException
+{
+
+    const API_VERSION_INCORRECT = 1;
+    const HOUR_COUNT_LIMIT_EXCEED = 2;
+    const DAY_COUNT_LIMIT_EXCEED = 3;
+    const IP_NOT_TRUSTED = 4;
+    const SIGNATURE_ERROR = 5;
+    const NOT_ENOUGH_MONEY = 6;
+    const NO_SUCH_MERCHANT = 7;
+    const ORDER_ID_REPEAT = 8;
+    const WRONG_TO_PHONE = 9;
+    const OTHER = 10;
+
+    private $_codes = array(
+        'api_version_incorrect' => 1,
+        'hour_count_limit_exceed' => 2,
+        'day_count_limit_exceed' => 3,
+        'ip_not_trusted' => 4,
+        'signature_error' => 5,
+        'not_enough_money' => 6,
+        'no_such_merchant' => 7,
+        'order_id_repeat' => 8,
+        'wrong_to_phone' => 9
+    );
+
+    public function __construct($message, $code, $previous)
+    {
+        $intCode = isset($this->_codes[$code]) ? $this->_codes[$code] : self::OTHER;
+        parent::__construct($message, $intCode, $previous);
     }
 
 }
