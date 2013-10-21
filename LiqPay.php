@@ -206,7 +206,7 @@ class LiqPayException extends CException
         'wrong_to_phone' => 9
     );
 
-    public function __construct($message, $code, $previous)
+    public function __construct($message, $code, $previous = null)
     {
         $intCode = isset($this->_codes[$code]) ? $this->_codes[$code] : self::OTHER;
         parent::__construct($message, $intCode, $previous);
